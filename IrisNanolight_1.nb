@@ -1,0 +1,960 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 8.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     40615,        952]
+NotebookOptionsPosition[     40194,        933]
+NotebookOutlinePosition[     40599,        950]
+CellTagsIndexPosition[     40556,        947]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[" ", "Text",
+ Editable->False,
+ Selectable->False,
+ CellFrame->{{0, 0}, {0, 3}},
+ ShowCellBracket->False,
+ CellMargins->{{0, 0}, {1, 1}},
+ CellElementSpacings->{"CellMinHeight"->1},
+ CellFrameMargins->0,
+ CellFrameColor->RGBColor[0, 0, 1],
+ CellSize->{Inherited, 5}],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ StyleBox["IrisNanolight", "Title"],
+ "\nThis file is part of IrisNanolight a package of ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " (C) scripts for the calculation of optical properties in Nanophotonics. \n\
+\nThis script allows you to characterize the optical properties of Surface \
+Plasmon Polaritons (SPPs) for any metal which dielectric constant has been \
+previously fitted into a Drude-Lorentz model.  SPP wavelength, skin-depth and \
+propagation constant is easily obtained. In addition this script allows you \
+to obtain the full band structure of a metal/dielectric interface for \
+rectangular lattices within the 1st Brillouin zone, in the limit of very \
+small scatterers (actually zero size scatter). \n\nIrisNanolight  is licensed \
+under the AGPL and it is free to use. However, if you use IrisNanolight  in a \
+work that leads to a scientific or academic publication, we would appreciate \
+it if you would kindly cite IrisNanolight  in your manuscript.\n\n> S.G. \
+Rodrigo,  \n> \[OpenCurlyDoubleQuote]Optical Properties of Nanostructured \
+Metallic Systems\[CloseCurlyDoubleQuote],\n> Springer-Verlag, Berlin, (2012)\n\
+\nThe book can be found at ",
+ ButtonBox["https://www.springer.com/gp/book/9783642230844",
+  BaseStyle->"Hyperlink",
+  ButtonData->{
+    URL["https://www.springer.com/gp/book/9783642230844"], None},
+  ButtonNote->"https://www.springer.com/gp/book/9783642230844"],
+ "\n\nImportant: This program is free to use. However, if you are using, or \
+plan to use it, specially if it is for research or academic purposes, please \
+send an email with your name, institution and a brief description of your \
+interest for this program. Commercial applications may also acquire a \
+commercial license. Please contact <sergut@unizar.es> for details.      \n\n\
+------------------------------------------------------------------------------\
+------------------------\nCopyright (C) 2019 Sergio G Rodrigo \
+<sergut@unizar.es>   \n\n- IrisNanolight  is free software: you can \
+redistribute it and/or modify it under the terms of the GNU Affero General \
+Public License as published by the Free Software Foundation, either version 3 \
+of the License,or (at your option) any later version.\n  \n- IrisNanolight  \
+is distributed in the hope that it will be useful for research or/and \
+academic purpouses, but WITHOUT ANY WARRANTY; without even the implied \
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU \
+Affero General Public License for more details. You should have received a \
+copy of the GNU Affero General Public License along with IrisNanolight. If \
+not,see <http://www.gnu.org/licenses/>.\n\n- IrisNanolight  implementation is \
+based on Wolfram ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " 11.3 version. It also works with previous versions of ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " from 8.0 version.\n"
+}], "Subsubtitle",
+ CellChangeTimes->{
+  3.7870741238652725`*^9, {3.7870741547310376`*^9, 3.7870743518823137`*^9}, {
+   3.7870743917555947`*^9, 3.7870744579553814`*^9}, {3.787123890946745*^9, 
+   3.787123914274079*^9}, {3.787127532999869*^9, 3.787127831314295*^9}, {
+   3.7871278881966352`*^9, 3.787127913898105*^9}, {3.7871279441168337`*^9, 
+   3.787127947566031*^9}},
+ Background->GrayLevel[0.85]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Physical", " ", "constants"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"h", ":=", 
+    RowBox[{"6.626", " ", 
+     SuperscriptBox["10", 
+      RowBox[{"-", "34"}]]}]}], "                    ", 
+   RowBox[{"(*", 
+    RowBox[{"J", "/", "s"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"c", ":=", 
+    RowBox[{"3", " ", 
+     SuperscriptBox["10", "8"]}]}], "                           ", 
+   RowBox[{"(*", 
+    RowBox[{"m", "/", "s"}], "*)"}], "\n", 
+   RowBox[{"e", ":=", 
+    RowBox[{"1.6021773", " ", 
+     SuperscriptBox["10", 
+      RowBox[{"-", "19"}]]}]}], "  ", 
+   RowBox[{"(*", 
+    RowBox[{"J", "/", "eV"}], "*)"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"Auxiliary", " ", "parameters"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"flw", ":=", "1239.8283"}], "  ", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+    "Conversion", " ", "from", " ", "nm", " ", "to", " ", "eV", " ", "and", 
+     " ", "viceversa"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\[Omega]", "[", "x_", "]"}], ":=", 
+    FractionBox["flw", "x"]}], 
+   RowBox[{"(*", " ", 
+    RowBox[{"x", " ", "=", 
+     RowBox[{"wavelength", " ", "in", " ", "nm"}]}], "*)"}], 
+   "\[IndentingNewLine]", 
+   StyleBox["\[IndentingNewLine]",
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], " ", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "Definition", " ", "of", " ", "metal", " ", "and", " ", "substrate", " ",
+       "dielectric", " ", "constants"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\[Epsilon]m", "[", "\[Omega]_", "]"}], ":=", " ", 
+    RowBox[{"\[Epsilon]r", "  ", "-", " ", 
+     FractionBox[
+      SuperscriptBox["\[Omega]p", "2"], 
+      RowBox[{"\[Omega]", 
+       RowBox[{"(", 
+        RowBox[{"\[Omega]", "+", 
+         RowBox[{"\[ImaginaryI]", " ", "\[Gamma]"}]}], ")"}]}]], "-", 
+     FractionBox[
+      RowBox[{"\[CapitalLambda]\[Epsilon]", " ", 
+       SuperscriptBox["\[CapitalOmega]", "2"]}], 
+      RowBox[{
+       SuperscriptBox["\[Omega]", "2"], "-", 
+       SuperscriptBox["\[CapitalOmega]", "2"], "+", 
+       RowBox[{
+       "\[ImaginaryI]", " ", "\[Omega]", " ", "\[CapitalGamma]"}]}]]}]}], " ", 
+   RowBox[{"(*", 
+    RowBox[{"Drude", "-", 
+     RowBox[{"Lorentz", " ", "dielectric", " ", "function"}]}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"\[Epsilon]", ":=", "2.25"}], 
+   RowBox[{"(*", 
+    RowBox[{"SUBSTRATE", " ", 
+     RowBox[{"(", 
+      RowBox[{"in", " ", "the", " ", "example", " ", "glass"}], ")"}], " ", 
+     "for", " ", "dispersion", " ", "relation", " ", "calculations"}], "*)"}],
+    "\[IndentingNewLine]", 
+   StyleBox["\[IndentingNewLine]",
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"Silver", " ", "dielectric", " ", "constant", " ", "from", " ", 
+      RowBox[{"Palik", "'"}], "s", " ", "book"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{"\[Epsilon]r", ":=", "4.6"}], "\[IndentingNewLine]", 
+   RowBox[{"\[Omega]p", ":=", "9.0"}], " ", 
+   RowBox[{"(*", "eV", "*)"}], "\[IndentingNewLine]", " ", 
+   RowBox[{"\[Gamma]", ":=", "0.07"}], 
+   RowBox[{"(*", "eV", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"\[CapitalLambda]\[Epsilon]", ":=", "1.10"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"\[CapitalOmega]", ":=", "4.9"}], 
+   RowBox[{"(*", "eV", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"\[CapitalGamma]", ":=", "1.2"}], 
+   RowBox[{"(*", "eV", "*)"}], "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+      RowBox[{
+      "More", " ", "details", " ", "and", " ", "additional", " ", "fittings", 
+       " ", "for", " ", "metals", " ", 
+       RowBox[{"in", ":", " ", 
+        RowBox[{"S", ".", "G", ".", "Rodrigo"}]}]}], ",", 
+      RowBox[{
+       RowBox[{"F", ".", "J", ".", "Garc\[IAcute]a"}], "-", "Vidal"}], ",", 
+      RowBox[{
+       RowBox[{"and", " ", 
+        RowBox[{"L", ".", "Mart\[IAcute]n"}]}], "-", "Moreno"}], ",", 
+      RowBox[{
+      "\"\<Influence of material properties on extraordinary optical \
+transmission through hole arrays,\>\"", " ", 
+       RowBox[{"Phys", ".", " ", "Rev", ".", " ", "B"}], " ", "77"}], ",", 
+      " ", 
+      RowBox[{"075401", " ", 
+       RowBox[{
+        RowBox[{"(", "2008", ")"}], "."}]}]}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], 
+   StyleBox["\[IndentingNewLine]",
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "Definition", " ", "of", " ", "the", " ", "optical", " ", "properties", 
+      " ", "of", " ", "SPPs", " ", "at", " ", "the", " ", 
+      RowBox[{"metal", "/", "dielectric"}], " ", "interface", " ", "provided",
+       " ", "by", " ", "the", " ", "script"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Ksp", "[", "\[Lambda]_", "]"}], ":=", 
+    RowBox[{
+     FractionBox[
+      RowBox[{"2.0", " ", "\[Pi]"}], "\[Lambda]"], 
+     SqrtBox[
+      FractionBox[
+       RowBox[{"\[Epsilon]", " ", 
+        RowBox[{"\[Epsilon]m", "[", 
+         RowBox[{"\[Omega]", "[", "\[Lambda]", "]"}], "]"}]}], 
+       RowBox[{"\[Epsilon]", "+", 
+        RowBox[{"\[Epsilon]m", "[", 
+         RowBox[{"\[Omega]", "[", "\[Lambda]", "]"}], "]"}]}]]]}]}], " ", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"SPP", " ", "wavevector"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"skin", "[", 
+     RowBox[{"em_", ",", "ko_", ",", "ksp_"}], "]"}], ":=", 
+    FractionBox["1.0", 
+     RowBox[{"Abs", "[", " ", 
+      RowBox[{"Im", "[", 
+       SqrtBox[
+        RowBox[{
+         RowBox[{"em", " ", 
+          SuperscriptBox["ko", "2"]}], "-", 
+         SuperscriptBox["ksp", "2"]}]], " ", "]"}], "]"}]]}], " ", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"SPP", " ", "skin", " ", "depth"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\[Lambda]sp", "[", "ksp_", "]"}], ":=", 
+    FractionBox[
+     RowBox[{"2.0", " ", "\[Pi]"}], 
+     RowBox[{"Re", "[", "ksp", "]"}]]}], " ", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"SPP", " ", "wavelength"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Labs", "[", "ksp_", "]"}], ":=", 
+    FractionBox["1.0", 
+     RowBox[{"Abs", "[", 
+      RowBox[{"2.0", " ", 
+       RowBox[{"Im", "[", "ksp", "]"}]}], "]"}]]}], " ", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"SPP", " ", "propagation", " ", "length"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{"Range", " ", "of", " ", "wavelengths"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], 
+   StyleBox["\[IndentingNewLine]",
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], 
+   RowBox[{
+    RowBox[{"\[Lambda]o", ":=", "400.0"}], ";", 
+    RowBox[{"\[Lambda]f", ":=", "2000.0"}], ";", 
+    RowBox[{"\[CapitalDelta]\[Lambda]", ":=", "1.0"}]}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "Optical", " ", "properties", " ", "of", " ", "SPPs", " ", "at", " ", 
+      "fixed", " ", "\[Lambda]o", " ", "wavelength"}], "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+   "Print", "[", 
+    "\"\<Optical properties of SPPs at fixed \[Lambda]o wavelength\>\"", 
+    "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{
+    "\"\<\[Lambda]o   = \>\"", ",", "\[Lambda]o", ",", "\"\<(nm)\>\""}], 
+    "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<\!\(\*SubscriptBox[\(\[Epsilon]\), \(metal\)]\) = \>\"", ",", 
+     RowBox[{"\[Epsilon]m", "[", 
+      RowBox[{"\[Omega]", "[", "\[Lambda]o", "]"}], "]"}]}], "]"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<Ksp = \>\"", ",", 
+     RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], ",", 
+     "\"\< (\!\(\*SuperscriptBox[\(nm\), \(-1\)]\))\>\""}], "]"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<\[Lambda]spp = \>\"", ",", 
+     RowBox[{"\[Lambda]sp", "[", 
+      RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "]"}], ",", "\"\< (nm)\>\""}], 
+    "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<Labs = \>\"", ",", 
+     RowBox[{
+      RowBox[{"Labs", "[", 
+       RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "]"}], "/", "1000.0"}], ",", 
+     "\"\< (\[Mu]m)\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<skin(metal) = \>\"", ",", 
+     RowBox[{"skin", "[", 
+      RowBox[{
+       RowBox[{"\[Epsilon]m", "[", 
+        RowBox[{"\[Omega]", "[", "\[Lambda]o", "]"}], "]"}], ",", 
+       FractionBox[
+        RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ",", 
+       RowBox[{"Ksp", "[", "\[Lambda]o", "]"}]}], "]"}], ",", 
+     "\"\< (nm)\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<kz(metal) = \>\"", ",", 
+     RowBox[{"2.0", "  ", 
+      RowBox[{"\[Pi]", "/", 
+       RowBox[{"Re", "[", 
+        SqrtBox[
+         RowBox[{
+          RowBox[{
+           RowBox[{"\[Epsilon]m", "[", 
+            RowBox[{"\[Omega]", "[", "\[Lambda]o", "]"}], "]"}], " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             FractionBox[
+              RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ")"}], "2"]}], "-", 
+          SuperscriptBox[
+           RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "2"]}]], "]"}]}]}], ",", 
+     "\"\< (nm)\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<kz(metal) = \>\"", ",", 
+     RowBox[{"Im", "[", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{
+         RowBox[{"\[Epsilon]m", "[", 
+          RowBox[{"\[Omega]", "[", "\[Lambda]o", "]"}], "]"}], " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           FractionBox[
+            RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ")"}], "2"]}], "-", 
+        SuperscriptBox[
+         RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "2"]}]], "]"}], ",", 
+     "\"\< (\!\(\*SuperscriptBox[\(nm\), \(-1\)]\))\>\""}], "]"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<skin(dielectric) = \>\"", ",", 
+     RowBox[{"skin", "[", 
+      RowBox[{"\[Epsilon]", ",", 
+       FractionBox[
+        RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ",", 
+       RowBox[{"Ksp", "[", "\[Lambda]o", "]"}]}], "]"}], ",", 
+     "\"\< (nm)\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<kz(dielectric) = \>\"", ",", 
+     RowBox[{"2.0", "  ", 
+      RowBox[{"\[Pi]", "/", 
+       RowBox[{"Re", "[", 
+        SqrtBox[
+         RowBox[{
+          RowBox[{"\[Epsilon]", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             FractionBox[
+              RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ")"}], "2"]}], "-", 
+          SuperscriptBox[
+           RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "2"]}]], "]"}]}]}], ",", 
+     "\"\< (nm)\>\""}], "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<kz(dielectric) = \>\"", ",", 
+     RowBox[{"Im", "[", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"\[Epsilon]", " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           FractionBox[
+            RowBox[{"2", " ", "\[Pi]"}], "\[Lambda]o"], ")"}], "2"]}], "-", 
+        SuperscriptBox[
+         RowBox[{"Ksp", "[", "\[Lambda]o", "]"}], "2"]}]], "]"}], ",", 
+     "\"\< (\!\(\*SuperscriptBox[\(nm\), \(-1\)]\))\>\""}], "]"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "File", " ", "for", " ", "metal", " ", "dielectric", " ", "constant"}], 
+     "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"strm", "=", 
+     RowBox[{"OpenWrite", "[", "\"\<C:\\eps.dat\>\"", "]"}]}], ";", " ", 
+    RowBox[{"SetOptions", "[", 
+     RowBox[{"strm", ",", 
+      RowBox[{"FormatType", "\[Rule]", " ", "StandardForm"}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"i", "=", "\[Lambda]o"}], ",", 
+      RowBox[{"i", "\[LessEqual]", "\[Lambda]f"}], ",", 
+      RowBox[{
+       RowBox[{"Write", "[", 
+        RowBox[{"strm", ",", "i", ",", "\"\< \>\"", ",", 
+         RowBox[{"\[Omega]", "[", "i", "]"}], ",", "\"\< \>\"", ",", 
+         RowBox[{"Re", "[", 
+          RowBox[{"\[Epsilon]m", "[", 
+           RowBox[{"\[Omega]", "[", "i", "]"}], "]"}], "]"}], ",", 
+         "\"\< \>\"", ",", 
+         RowBox[{"Im", "[", 
+          RowBox[{"\[Epsilon]m", "[", 
+           RowBox[{"\[Omega]", "[", "i", "]"}], "]"}], "]"}]}], "]"}], ";", 
+       RowBox[{"i", "=", 
+        RowBox[{"i", "+", "\[CapitalDelta]\[Lambda]"}]}]}]}], "]"}], ";", 
+    RowBox[{"Close", "[", "strm", "]"}]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Writes", ":", " ", 
+      RowBox[{"\[Lambda]", 
+       RowBox[{"(", "nm", ")"}]}]}], ",", 
+     RowBox[{"\[Omega]", 
+      RowBox[{"(", "eV", ")"}]}], ",", 
+     RowBox[{"Re", "[", "\[Epsilon]_metal", "]"}], ",", 
+     RowBox[{"Im", "[", "\[Epsilon]_metal", "]"}]}], "*)"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "File", " ", "for", " ", "SPP", " ", "optical", " ", "properties"}], 
+     "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"strm", "=", 
+     RowBox[{"OpenWrite", "[", "\"\<C:\\SPP_properties.dat\>\"", "]"}]}], ";",
+     " ", 
+    RowBox[{"SetOptions", "[", 
+     RowBox[{"strm", ",", 
+      RowBox[{"FormatType", "\[Rule]", " ", "StandardForm"}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"i", "=", "\[Lambda]o"}], ",", 
+      RowBox[{"i", "\[LessEqual]", "\[Lambda]f"}], ",", 
+      RowBox[{
+       RowBox[{"Write", "[", 
+        RowBox[{"strm", ",", "i", ",", "\"\< \>\"", ",", 
+         RowBox[{"\[Omega]", "[", "i", "]"}], ",", "\"\< \>\"", ",", 
+         FractionBox[
+          RowBox[{"2.0", " ", "\[Pi]", " "}], 
+          RowBox[{"Re", "[", 
+           RowBox[{"Ksp", "[", "i", "]"}], "]"}]], ",", "\"\< \>\"", ",", 
+         FractionBox[
+          RowBox[{"Labs", "[", 
+           RowBox[{"Ksp", "[", "i", "]"}], "]"}], "1000.0"], ",", "\"\< \>\"",
+          ",", 
+         RowBox[{"skin", "[", 
+          RowBox[{
+           RowBox[{"\[Epsilon]m", "[", 
+            RowBox[{"\[Omega]", "[", "i", "]"}], "]"}], ",", 
+           RowBox[{
+            SqrtBox["\[Epsilon]"], 
+            FractionBox[
+             RowBox[{"2.0", " ", "\[Pi]"}], "i"]}], ",", 
+           RowBox[{"Ksp", "[", "i", "]"}]}], "]"}]}], "]"}], ";", 
+       RowBox[{"i", "=", 
+        RowBox[{"i", "+", "\[CapitalDelta]\[Lambda]"}]}]}]}], "]"}], ";", 
+    RowBox[{"Close", "[", "strm", "]"}]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Writes", ":", " ", 
+      RowBox[{"\[Lambda]", 
+       RowBox[{"(", "nm", ")"}]}]}], ",", 
+     RowBox[{"\[Omega]", 
+      RowBox[{"(", "eV", ")"}]}], ",", 
+     RowBox[{"\[Lambda]spp", 
+      RowBox[{"(", "nm", ")"}]}], ",", 
+     RowBox[{"Labs", 
+      RowBox[{"(", "microns", ")"}]}], ",", 
+     RowBox[{"skin", "-", 
+      RowBox[{"depth", 
+       RowBox[{"(", "nm", ")"}]}]}]}], "*)"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", 
+     RowBox[{
+     "File", " ", "for", " ", "flat", " ", "surface", " ", "SPP", " ", 
+      "dispersion", " ", "relation", " ", "and", " ", "light", " ", "cone"}], 
+     "*)"}],
+    FontColor->GrayLevel[0],
+    Background->RGBColor[0.87, 0.94, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"strm", "=", 
+     RowBox[{"OpenWrite", "[", "\"\<C:\\kspp.dat\>\"", "]"}]}], ";", 
+    RowBox[{"SetOptions", "[", 
+     RowBox[{"strm", ",", 
+      RowBox[{"FormatType", "\[Rule]", " ", "StandardForm"}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"i", "=", "\[Lambda]o"}], ",", 
+      RowBox[{"i", "\[LessEqual]", "\[Lambda]f"}], ",", 
+      RowBox[{
+       RowBox[{"Write", "[", 
+        RowBox[{"strm", ",", "i", ",", "\"\< \>\"", ",", 
+         RowBox[{"\[Omega]", "[", "i", "]"}], ",", "\"\< \>\"", ",", 
+         RowBox[{"1000.0", 
+          RowBox[{"Re", "[", 
+           RowBox[{"Ksp", "[", "i", "]"}], "]"}]}], ",", "\"\< \>\"", ",", 
+         RowBox[{"1000.0", 
+          SqrtBox["\[Epsilon]"], 
+          FractionBox[
+           RowBox[{"2.0", " ", "\[Pi]"}], "i"]}]}], "]"}], ";", 
+       RowBox[{"i", "=", 
+        RowBox[{"i", "+", "\[CapitalDelta]\[Lambda]"}]}]}]}], "]"}], ";", 
+    RowBox[{"Close", "[", "strm", "]"}]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Writes", ":", " ", 
+      RowBox[{"\[Lambda]", 
+       RowBox[{"(", "nm", ")"}]}]}], ",", 
+     RowBox[{"\[Omega]", 
+      RowBox[{"(", "eV", ")"}]}], ",", 
+     RowBox[{"kspp", 
+      RowBox[{"(", 
+       RowBox[{"microns", "^", 
+        RowBox[{"(", 
+         RowBox[{"-", "1"}], ")"}]}], ")"}]}], ",", 
+     RowBox[{"klight", "-", 
+      RowBox[{"cone", 
+       RowBox[{"(", 
+        RowBox[{"microns", "^", 
+         RowBox[{"(", 
+          RowBox[{"-", "1"}], ")"}]}], ")"}]}]}]}], "*)"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   StyleBox[
+    RowBox[{"(*", " ", 
+     RowBox[{"Band", " ", "structure", " ", "calculations", " ", 
+      StyleBox[
+       RowBox[{
+        StyleBox["f", "Subtitle",
+         FontColor->RGBColor[0, 0, 1]], "or"}]], 
+      StyleBox[" ", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[
+       RowBox[{
+        StyleBox[
+         StyleBox["s", "Subtitle",
+          FontColor->RGBColor[0, 0, 1]], "Subtitle",
+         FontColor->RGBColor[0, 0, 1]], "quare"}]], " ", "lattices", 
+      StyleBox[" ", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[
+       RowBox[{
+        StyleBox["wi", "Subtitle",
+         FontColor->RGBColor[0, 0, 1]], "th", 
+        StyleBox["i", "Subtitle",
+         FontColor->RGBColor[0, 0, 1]], 
+        StyleBox[
+         StyleBox["n", "Subtitle",
+          FontColor->RGBColor[0, 0, 1]], "Subtitle",
+         FontColor->RGBColor[0, 0, 1]]}]], 
+      StyleBox[" ", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[
+       StyleBox[
+        StyleBox[
+         StyleBox[
+          StyleBox["1", "Subtitle",
+           FontColor->RGBColor[0, 0, 1]], "Subtitle",
+          FontColor->RGBColor[0, 0, 1]], "Subtitle",
+         FontColor->RGBColor[0, 0, 1]], "Subtitle",
+        FontColor->RGBColor[0, 0, 1]], "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox["st", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[" ", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[
+       StyleBox["Brillouin", "Subtitle",
+        FontColor->RGBColor[0, 0, 1]], "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[" ", "Subtitle",
+       FontColor->RGBColor[0, 0, 1]], 
+      StyleBox[
+       StyleBox["zone", "Subtitle",
+        FontColor->RGBColor[0, 0, 1]], "Subtitle",
+       FontColor->RGBColor[0, 0, 1]]}], "  ", 
+     StyleBox[
+      RowBox[{
+       StyleBox["*", "Subtitle",
+        FontColor->RGBColor[0, 0, 1]], 
+       StyleBox[")", "Subtitle",
+        FontColor->RGBColor[0, 0, 1]]}]]}], "Subtitle",
+    FontColor->RGBColor[0, 0, 1]], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Lx", ":=", "500.0"}], ";", " ", 
+    RowBox[{"Ly", ":=", "Lx"}]}], " ", 
+   RowBox[{"(*", 
+    RowBox[{"lattice", " ", "constants"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"\[Lambda]s", ":=", 
+    RowBox[{"1.0", " ", "Lx"}]}], " ", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+     RowBox[{"seed", " ", "wavelength", " ", "for", " ", "FindRoot"}], " ", 
+     "-", " ", 
+     RowBox[{
+     "by", " ", "default", " ", "Lx", " ", "to", " ", "finely", " ", 
+      "capture", " ", "the", " ", "band", " ", "around", " ", "the", " ", 
+      "X"}], "-", 
+     RowBox[{"point", " ", "of", " ", "the", " ", "BS"}]}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fmode", "[", 
+     RowBox[{"kx_", ",", "ky_", ",", "n_", ",", "m_", ",", "\[Lambda]_"}], 
+     "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"kx", "+", 
+        RowBox[{
+         FractionBox[
+          RowBox[{"2", "\[Pi]"}], "Lx"], " ", "n"}]}], ")"}], "^", "2"}], "+",
+      " ", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"ky", "+", 
+        RowBox[{
+         FractionBox[
+          RowBox[{"2", "\[Pi]"}], "Lx"], " ", "m"}]}], ")"}], "^", "2"}], "-", 
+     RowBox[{
+      RowBox[{"Re", "[", 
+       RowBox[{"Ksp", "[", "\[Lambda]", "]"}], "]"}], "^", "2"}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"f", "[", 
+     RowBox[{"kx_", ",", "ky_", ",", "n_", ",", "m_"}], "]"}], ":=", " ", 
+    RowBox[{"\[Lambda]", "/.", " ", 
+     RowBox[{"FindRoot", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"fmode", "[", 
+         RowBox[{"kx", ",", "ky", ",", "n", ",", "m", ",", "\[Lambda]"}], 
+         "]"}], "\[Equal]", "0"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"\[Lambda]", ",", "\[Lambda]s"}], "}"}]}], "]"}]}]}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"maxn", "=", "4"}], "\[IndentingNewLine]", 
+   RowBox[{"maxm", "=", "4"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"strm", "=", 
+     RowBox[{"OpenWrite", "[", 
+      RowBox[{"\"\<C:\\BS_p=\>\"", "<>", 
+       RowBox[{"ToString", "[", "Lx", "]"}], "<>", "\"\<nm.dat\>\""}], 
+      "]"}]}], ";", 
+    RowBox[{"SetOptions", "[", 
+     RowBox[{"strm", ",", 
+      RowBox[{"FormatType", "\[Rule]", "StandardForm"}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"n", "=", 
+      RowBox[{"-", "maxn"}]}], ",", 
+     RowBox[{"n", "\[LessEqual]", "maxn"}], ",", 
+     RowBox[{"n", "++"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"For", "[", 
+      RowBox[{
+       RowBox[{"m", "=", 
+        RowBox[{"-", "maxm"}]}], ",", 
+       RowBox[{"m", "\[LessEqual]", "maxm"}], ",", 
+       RowBox[{"m", "++"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"\[CapitalGamma]", "\[Rule]", 
+          RowBox[{
+           RowBox[{"X", " ", 
+            RowBox[{"band", ":", "kx"}]}], "\[Rule]", "i"}]}], ";", 
+         RowBox[{"ky", "=", "0"}], " ", ";", " ", 
+         RowBox[{
+          RowBox[{"X", "\[Rule]", 
+           RowBox[{"M", " ", 
+            RowBox[{"band", ":", "kx"}]}]}], "=", 
+          FractionBox["\[Pi]", "Lx"]}], ";", " ", 
+         RowBox[{"ky", "\[Rule]", "i"}], " ", ";", " ", 
+         RowBox[{"M", "\[Rule]", 
+          RowBox[{
+           RowBox[{"\[CapitalGamma]", " ", "band", " ", "kx"}], "\[Rule]", 
+           "i"}]}], ";", " ", 
+         RowBox[{"ky", "\[Rule]", "i"}]}], "*)"}], "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{"k", "-", 
+         RowBox[{"vector", " ", "in", " ", 
+          RowBox[{"microns", "^", 
+           RowBox[{"(", 
+            RowBox[{"-", "1"}], ")"}]}]}]}], "*)"}], "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"For", "[", 
+         RowBox[{
+          RowBox[{"i", "=", "0"}], ",", 
+          RowBox[{"i", "\[LessEqual]", 
+           FractionBox["\[Pi]", "Lx"]}], ",", 
+          RowBox[{
+           RowBox[{"ky", "=", "0"}], " ", ";", " ", 
+           RowBox[{"\[Lambda]b", ":=", 
+            RowBox[{"f", "[", 
+             RowBox[{"i", ",", "ky", ",", "n", ",", "m"}], "]"}]}], ";", " ", 
+           RowBox[{"Write", "[", 
+            RowBox[{"strm", ",", 
+             RowBox[{
+              RowBox[{"10", "^", "3"}], " ", "i"}], " ", ",", "\"\< \>\"", 
+             ",", "\[Lambda]b", ",", "\"\< \>\"", ",", 
+             RowBox[{"\[Omega]", "[", "\[Lambda]b", "]"}]}], "]"}], " ", ";", 
+           RowBox[{"i", "=", 
+            RowBox[{"i", "+", 
+             RowBox[{"0.005", " ", 
+              FractionBox["\[Pi]", "Lx"]}]}]}]}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"For", "[", 
+         RowBox[{
+          RowBox[{"i", "=", "0"}], ",", 
+          RowBox[{"i", "\[LessEqual]", 
+           FractionBox["\[Pi]", "Lx"]}], ",", 
+          RowBox[{
+           RowBox[{"kx", "=", 
+            FractionBox["\[Pi]", "Lx"]}], " ", ";", 
+           RowBox[{"\[Lambda]b", ":=", 
+            RowBox[{"f", "[", 
+             RowBox[{"kx", ",", "i", ",", "n", ",", "m"}], "]"}]}], ";", " ", 
+           RowBox[{"Write", "[", 
+            RowBox[{"strm", ",", 
+             RowBox[{
+              RowBox[{"10", "^", "3"}], 
+              RowBox[{"(", 
+               RowBox[{
+                FractionBox["\[Pi]", "Lx"], "+", "i"}], " ", ")"}]}], ",", 
+             "\"\< \>\"", ",", "\[Lambda]b", ",", "\"\< \>\"", ",", 
+             RowBox[{"\[Omega]", "[", "\[Lambda]b", "]"}]}], "]"}], " ", ";", 
+           RowBox[{"i", "=", 
+            RowBox[{"i", "+", 
+             RowBox[{"0.005", " ", 
+              FractionBox["\[Pi]", "Lx"]}]}]}]}]}], "]"}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"For", "[", 
+         RowBox[{
+          RowBox[{"i", "=", "0"}], ",", 
+          RowBox[{"i", "\[LessEqual]", 
+           FractionBox["\[Pi]", "Lx"]}], ",", 
+          RowBox[{
+           RowBox[{"\[Lambda]b", ":=", 
+            RowBox[{"f", "[", 
+             RowBox[{"i", ",", "i", ",", "n", ",", "m"}], "]"}]}], ";", " ", 
+           RowBox[{"Write", "[", 
+            RowBox[{"strm", ",", 
+             RowBox[{
+              RowBox[{"10", "^", "3"}], " ", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"-", "i"}], " ", "+", 
+                RowBox[{"3.0", 
+                 FractionBox["\[Pi]", "Lx"]}]}], ")"}]}], ",", "\"\< \>\"", 
+             ",", "\[Lambda]b", ",", "\"\< \>\"", ",", 
+             RowBox[{"\[Omega]", "[", "\[Lambda]b", "]"}]}], "]"}], " ", ";", 
+           RowBox[{"i", "=", 
+            RowBox[{"i", "+", 
+             RowBox[{"0.005", " ", 
+              FractionBox["\[Pi]", "Lx"]}]}]}]}]}], "]"}], ";"}]}], "]"}]}], 
+    "]"}], "\[IndentingNewLine]", 
+   RowBox[{"Close", "[", "strm", "]"}], " ", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Writes", ":", " ", 
+      RowBox[{"kspp", 
+       RowBox[{"(", 
+        RowBox[{"microns", "^", 
+         RowBox[{"(", 
+          RowBox[{"-", "1"}], ")"}]}], ")"}]}]}], ",", " ", 
+     RowBox[{"\[Lambda]", 
+      RowBox[{"(", "nm", ")"}]}], ",", 
+     RowBox[{"\[Omega]", 
+      RowBox[{
+       RowBox[{"(", "eV", ")"}], ".", " ", 
+       RowBox[{"Tip", ":", " ", 
+        RowBox[{
+        "plot", " ", "data", " ", "as", " ", "symbols", " ", "and", " ", 
+         "set", " ", "range", " ", "of", " ", "k", " ", "and", " ", 
+         "frequency", " ", "by", " ", 
+         RowBox[{"hand", ".", " ", "Some"}], " ", "extra", " ", "spurious", 
+         " ", "solutions", " ", "are", " ", "provided", " ", "by", " ", 
+         "FindRoot"}]}]}]}]}], "*)"}]}]}]], "Input",
+ CellChangeTimes->{
+  3.6213339551410093`*^9, {3.6213343002565174`*^9, 3.6213344113356237`*^9}, {
+   3.621334581851448*^9, 3.621334585724061*^9}, {3.6213346549511375`*^9, 
+   3.621334712305401*^9}, {3.62133474671496*^9, 3.6213347524083905`*^9}, {
+   3.6213348033922915`*^9, 3.6213348070699244`*^9}, {3.6399966832095175`*^9, 
+   3.6399966837505713`*^9}, {3.640002112668437*^9, 3.6400021465558257`*^9}, {
+   3.6400023883910065`*^9, 3.640002435507718*^9}, {3.640002532830449*^9, 
+   3.6400026605262175`*^9}, {3.640004943869392*^9, 3.640004947112632*^9}, {
+   3.640058042808132*^9, 3.6400580687137957`*^9}, {3.6400581000265894`*^9, 
+   3.640058210041229*^9}, {3.6400584117836876`*^9, 3.6400584187336025`*^9}, {
+   3.649068313972447*^9, 3.649068462654951*^9}, {3.649068530386825*^9, 
+   3.6490685316208954`*^9}, {3.6490686354508343`*^9, 3.649068636126873*^9}, 
+   3.6490687559127245`*^9, {3.649068786483473*^9, 3.6490687881045656`*^9}, 
+   3.6490688409815903`*^9, {3.6490690221739535`*^9, 3.649069028668325*^9}, {
+   3.649069250184995*^9, 3.6490693317496605`*^9}, 3.649069364453531*^9, {
+   3.649069406620943*^9, 3.649069410614171*^9}, {3.6490694812002087`*^9, 
+   3.6490695138440757`*^9}, {3.6490695445328307`*^9, 3.64906958578119*^9}, {
+   3.649069652824025*^9, 3.64906979768931*^9}, {3.649069852359438*^9, 
+   3.649069903906386*^9}, {3.649069979544712*^9, 3.6490699831379175`*^9}, {
+   3.6490700248373027`*^9, 3.649070038500084*^9}, {3.649070086475828*^9, 
+   3.649070143365082*^9}, {3.6490701796081553`*^9, 3.649070191525837*^9}, {
+   3.649070262689907*^9, 3.6490702761276755`*^9}, {3.6490703195141573`*^9, 
+   3.649070344978614*^9}, {3.6490703824427567`*^9, 3.6490704550829115`*^9}, {
+   3.649070520604659*^9, 3.649070602154323*^9}, {3.649070641343565*^9, 
+   3.6490706456538115`*^9}, {3.6490706815868664`*^9, 3.649070711825596*^9}, {
+   3.649070743637416*^9, 3.649070804697908*^9}, {3.6490708431531076`*^9, 
+   3.6490709346293397`*^9}, {3.6490709688022947`*^9, 3.649071063499711*^9}, {
+   3.6490711108434186`*^9, 3.649071165348536*^9}, {3.649071219813651*^9, 
+   3.649071226397028*^9}, {3.649071295286968*^9, 3.6490712987721677`*^9}, {
+   3.649071359391635*^9, 3.649071488369012*^9}, {3.6490715196278*^9, 
+   3.649071524294067*^9}, {3.649071619099489*^9, 3.649071652754414*^9}, {
+   3.649071700863166*^9, 3.6490717032873044`*^9}, {3.649071738034292*^9, 
+   3.6490717384963183`*^9}, {3.6490717902322774`*^9, 
+   3.6490719258490343`*^9}, {3.6490720674191313`*^9, 
+   3.6490720723894157`*^9}, {3.6490721237333527`*^9, 3.649072143042457*^9}, {
+   3.649072175807331*^9, 3.6490721793255324`*^9}, {3.6490748769888296`*^9, 
+   3.6490749225604362`*^9}, {3.6490752364453897`*^9, 
+   3.6490752770907145`*^9}, {3.6490758938569913`*^9, 3.649075896420138*^9}, {
+   3.6490759374424844`*^9, 3.649076033803996*^9}, {3.649076337840386*^9, 
+   3.64907634088756*^9}, {3.649076385348103*^9, 3.6490763979268227`*^9}, {
+   3.6495716849662485`*^9, 3.6495716872053766`*^9}, {3.649575549284275*^9, 
+   3.6495755523384495`*^9}, {3.6549392055307417`*^9, 
+   3.6549392058357534`*^9}, {3.6549392482074485`*^9, 3.654939252512621*^9}, {
+   3.6549393024646187`*^9, 3.654939303799672*^9}, {3.6549393896831074`*^9, 
+   3.6549393902431297`*^9}, {3.6549394278971357`*^9, 
+   3.6549394281696463`*^9}, {3.65493947897118*^9, 3.654939485168928*^9}, {
+   3.6549395332133493`*^9, 3.6549395341383867`*^9}, {3.654940256059271*^9, 
+   3.654940336911005*^9}, {3.6549403716023927`*^9, 3.6549403727349377`*^9}, {
+   3.65494042593357*^9, 3.654940489213601*^9}, {3.6555404043563547`*^9, 
+   3.655540405957515*^9}, {3.6555450086877604`*^9, 3.6555450100688987`*^9}, {
+   3.6555464028531632`*^9, 3.6555464089127693`*^9}, {3.6555523634541817`*^9, 
+   3.655552377444182*^9}, {3.655705933757038*^9, 3.655705938437045*^9}, {
+   3.6557101336865053`*^9, 3.655710137886511*^9}, {3.7055863960804434`*^9, 
+   3.7055864127353964`*^9}, {3.705586445985298*^9, 3.7055864882687163`*^9}, {
+   3.705586531149169*^9, 3.705586717346819*^9}, {3.7055868174645452`*^9, 
+   3.705586821374769*^9}, 3.7057373171408587`*^9, {3.705996115488992*^9, 
+   3.7059961164740906`*^9}, {3.7059961931197543`*^9, 
+   3.7059962379772396`*^9}, {3.7059976449929276`*^9, 3.705997652990727*^9}, {
+   3.7066144714922495`*^9, 3.7066144928646603`*^9}, {3.7066146674174166`*^9, 
+   3.706614684686949*^9}, {3.706614794466544*^9, 3.706614818569317*^9}, {
+   3.7287323500657873`*^9, 3.7287323557333546`*^9}, {3.728732398733654*^9, 
+   3.7287324611578956`*^9}, {3.728732494845264*^9, 3.7287325579835773`*^9}, {
+   3.728732931662942*^9, 3.7287329345102262`*^9}, {3.728825624683772*^9, 
+   3.7288256410964136`*^9}, 3.7288257732606287`*^9, 3.7288258506173635`*^9, {
+   3.7443525998345146`*^9, 3.7443526273022127`*^9}, {3.744353965094531*^9, 
+   3.744354107243997*^9}, {3.744354170380457*^9, 3.7443541763888063`*^9}, {
+   3.7443547655329475`*^9, 3.7443548219000845`*^9}, {3.744354967933225*^9, 
+   3.7443549703798113`*^9}, {3.7446272353890867`*^9, 3.744627275072252*^9}, {
+   3.744627352855857*^9, 3.7446273605724216`*^9}, {3.7446274004295654`*^9, 
+   3.744627448105785*^9}, {3.744627480908618*^9, 3.744627509180193*^9}, {
+   3.7446275654388847`*^9, 3.7446276098725147`*^9}, {3.744628201819927*^9, 
+   3.7446282395879602`*^9}, {3.7446282980861173`*^9, 
+   3.7446283870861483`*^9}, {3.744628430219204*^9, 3.7446284318360066`*^9}, {
+   3.7446290420018854`*^9, 3.7446290790506563`*^9}, {3.744629123151764*^9, 
+   3.7446291591854644`*^9}, {3.7446293365350924`*^9, 3.744629339018632*^9}, {
+   3.7446294708685474`*^9, 3.744629475501532*^9}, {3.744629561433901*^9, 
+   3.7446295765017548`*^9}, {3.7446296341348286`*^9, 3.744629650022214*^9}, {
+   3.744629737684817*^9, 3.7446297552514634`*^9}, {3.7446963301702585`*^9, 
+   3.744696463662257*^9}, {3.7446965022394886`*^9, 3.7446965440391455`*^9}, {
+   3.744697434475298*^9, 3.7446974517750416`*^9}, {3.744697491324557*^9, 
+   3.74469749743433*^9}, {3.7447146106215134`*^9, 3.7447146714702625`*^9}, {
+   3.7871215086434975`*^9, 3.7871215373245387`*^9}, {3.787121761882862*^9, 
+   3.787121861925002*^9}, {3.7871219003950567`*^9, 3.7871220856183643`*^9}, {
+   3.787122129546427*^9, 3.7871224947159543`*^9}, {3.787122892705638*^9, 
+   3.7871229089926605`*^9}, {3.7871230449038553`*^9, 
+   3.7871234560334444`*^9}, {3.7871236200456815`*^9, 3.787123621885684*^9}, {
+   3.7871236605869055`*^9, 3.787123715127428*^9}, {3.787123754502485*^9, 
+   3.787123802323555*^9}, {3.7871247267345486`*^9, 3.787124821059944*^9}, {
+   3.7871248660985203`*^9, 3.787124956417686*^9}, {3.7871250311709614`*^9, 
+   3.7871250588405447`*^9}, {3.7871251157537994`*^9, 
+   3.7871251341238503`*^9}, {3.787125167970786*^9, 3.7871252604390755`*^9}, {
+   3.787125351723296*^9, 3.7871253967598724`*^9}, {3.7871254469057407`*^9, 
+   3.787125503774993*^9}, {3.7871255418491707`*^9, 3.787125559215164*^9}, {
+   3.7871256865534477`*^9, 3.7871257118918967`*^9}, {3.787125885265813*^9, 
+   3.7871258960574303`*^9}, {3.787126017933401*^9, 3.787126102634246*^9}, {
+   3.7871262602659655`*^9, 3.787126264600974*^9}, {3.787126425714202*^9, 
+   3.7871264483592343`*^9}, {3.7871265158583317`*^9, 3.787126852808813*^9}, {
+   3.787126885061859*^9, 3.7871270221200542`*^9}, {3.787127055723102*^9, 
+   3.787127073515127*^9}, {3.787127278786419*^9, 3.787127303527454*^9}, {
+   3.7871274739007854`*^9, 3.7871274743707867`*^9}, {3.7871279728734784`*^9, 
+   3.787128062320595*^9}, {3.7871281184408045`*^9, 3.787128119218849*^9}, {
+   3.787128661464864*^9, 3.7871286624589205`*^9}, {3.7872105959036036`*^9, 
+   3.787210621997096*^9}, {3.7872106527478547`*^9, 3.7872107769779606`*^9}, {
+   3.7872108391865187`*^9, 3.7872110725228643`*^9}, {3.7872111047587085`*^9, 
+   3.7872111284990664`*^9}, {3.787211185459324*^9, 3.7872112087966585`*^9}, {
+   3.7872131673276806`*^9, 3.7872131677427044`*^9}, {3.787325991652561*^9, 
+   3.787326059055416*^9}, {3.7873260996677394`*^9, 3.7873261149846153`*^9}, {
+   3.7873261518937263`*^9, 3.787326152179743*^9}, {3.7873264733420887`*^9, 
+   3.7873265117622857`*^9}, {3.787327640235684*^9, 3.7873276707864313`*^9}, {
+   3.787329354888651*^9, 3.7873293561727247`*^9}, {3.787329472319368*^9, 
+   3.787329472649387*^9}, {3.7873295811995955`*^9, 3.787329663065278*^9}, 
+   3.787329728511021*^9, {3.7873297829551353`*^9, 3.787329818674178*^9}, 
+   3.7873299523178225`*^9, {3.787330026866086*^9, 3.78733013742441*^9}, {
+   3.7873301748015475`*^9, 3.7873302614625044`*^9}, {3.787330335938764*^9, 
+   3.7873304601388683`*^9}},
+ EmphasizeSyntaxErrors->True,
+ ExpressionUUID -> "7bc8882f-b26f-4edd-99fa-accc6096f751"]
+}, Open  ]]
+},
+WindowSize->{1350, 633},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{Automatic, Automatic},
+FrontEndVersion->"8.0 for Microsoft Windows (64-bit) (November 7, 2010)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 271, 9, 10, "Text"],
+Cell[CellGroupData[{
+Cell[853, 33, 3320, 55, 641, "Subsubtitle"],
+Cell[4176, 90, 36002, 840, 2056, "Input"]
+}, Open  ]]
+}
+]
+*)
+
